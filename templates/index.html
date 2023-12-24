@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>오디오 레코더</title>
+    </head>
+    <body>
+        <h1>간단한 오디오 레코더</h1>
+        <button id="start-recording">녹음 시작</button>
+        <button id="stop-recording" disabled>녹음 중지</button>
+        <audio id="audio-playback" controls></audio>
+        
+        <h2>Sign Up / Sign In</h2>
+        <form>
+            <label for="id">ID:</label><br>
+            <input type="text" id="id" name="id"><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password"><br>
+            <input type="button" value="Sign Up" onclick=signup()>
+            <input type="button" id="loginForm" value="Sign In" onclick=signin()>
+        </form>
+
+        <script>
+            function signin() {
+                console.log("hello, world!")
+                event.preventDefault();
+
+                var id = document.getElementById('id').value;
+                var password = document.getElementById('password').value;
+
+                fetch('http://127.0.0.1:5000/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({id: id, password: password}),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            };
+            function signup() {
+                console.log("hello, world!")
+                event.preventDefault();
+
+                var id = document.getElementById('id').value;
+                var password = document.getElementById('password').value;
+
+                fetch('http://127.0.0.1:5000/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({id: id, password: password}),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            };
+
+            let mediaRecorder;
+            let audioChunks = [];
+
+            document.getElementById("start-recording").addEventListener("click", function() {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream);
+                        mediaRecorder.start();
+                        document.getElementById("start-recording").disabled = true;
+                        document.getElementById("stop-recording").disabled = false;
+
+                        mediaRecorder.addEventListener("dataavailable", event => {
+                            audioChunks.push(event.data);
+                        });
+
+                        mediaRecorder.addEventListener("stop", () => {
+                            const audioBlob = new Blob(audioChunks);
+
+                            const audioUrl = URL.createObjectURL(audioBlob);
+                            document.getElementById("audio-playback").src = audioUrl;
+                            console.log("audioUrl="+audioUrl);
+
+                            // 여기에서 서버로 오디오 파일을 보내는 함수를 호출할 수 있습니다.
+                            // 예: sendAudioToServer(audioBlob);
+                            sendAudioToServer(audioBlob);
+
+                            audioChunks = [];
+                            document.getElementById("start-recording").disabled = false;
+                        });
+                    });
+            });
+
+            document.getElementById("stop-recording").addEventListener("click", function() {
+                mediaRecorder.stop();
+                document.getElementById("stop-recording").disabled = true;
+            });
+
+            function sendAudioToServer(audioBlob) {
+                const formData = new FormData();
+                formData.append('file', audioBlob, 'audio.webm');
+
+                fetch('http://127.0.0.1:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    console.log("requested audio!")
+                    audio.play();
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        </script>
+    </body>
+</html>
