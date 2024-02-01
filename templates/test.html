@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>POST 요청 보내기</title>
+</head>
+<body>
+    <h1>POST 요청 보내기</h1>
+    <form method="POST" action="http://localhost:8080/conversation/chat">
+        <label for="text">텍스트 입력:</label>
+        <input type="text" id="text" name="text">
+        <br>
+        <input type="submit" value="전송">
+    </form>
+
+    <h1>POST 요청 보내기</h1>
+    <form method="POST" action="http://localhost:8080/conversation/chat">
+        <label for="text">텍스트 입력:</label>
+        <input type="text" id="text" name="text">
+        <br>
+        <input type="submit" value="전송">
+    </form>
+
+
+    <h1>오디오 업로드 폼</h1>
+    <form action="/conversation/chat" method="POST" enctype="multipart/form-data">
+        <label for="user_audio">오디오 파일 선택:</label>
+        <input type="file" id="user_audio" name="user_audio" accept="audio/*" required>
+        <br>
+        <input type="submit" value="업로드">
+    </form>
+</body>
+</html>

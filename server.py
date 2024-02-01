@@ -61,6 +61,7 @@ def upload_audio():
         # return jsonify({'message': '파일이 성공적으로 업로드되었습니다.'})
         return send_file(result_mp3_path, as_attachment=True)
 
+
 @app.route('/signup', methods=['POST'])
 def sign_up():
     data = request.json
@@ -82,4 +83,4 @@ def sign_in():
     return jsonify({"success": False, "message": "필수 필드가 누락되었습니다."}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

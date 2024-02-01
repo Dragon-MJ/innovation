@@ -1,0 +1,6 @@
+firebase-admin
+openai_api
+ffmpeg
+flask
+flask_cors
+ipdb
